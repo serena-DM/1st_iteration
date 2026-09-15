@@ -1,61 +1,130 @@
+# 💳 Etoanko-Pay Mobile (Flutter)
 
-## Pour commencer
-
-Instructions pour configurer et lancer le projet sur votre machine locale.
-
-### Prérequis
-
--   [Flutter SDK](https://flutter.dev/docs/get-started/install) (version 3.x ou supérieure)
--   Un éditeur de code comme [VS Code](https://code.visualstudio.com/) ou [Android Studio](https://developer.android.com/studio).
--   Un émulateur Android ou un appareil physique.
-
-### Installation et Lancement
-
-1.  **Clonez le dépôt** :
-    ```sh
-    git clone <URL_DU_DEPOT>
-    cd etoanko_pay
-    ```
-
-2.  **Installez les dépendances** :
-    Cette commande télécharge tous les paquets nécessaires au projet.
-    ```sh
-    flutter pub get
-    ```
-
-3.  **Générez l'icône et le splash screen** (si vous modifiez le logo) :
-    ```sh
-    flutter pub run flutter_launcher_icons:main
-    flutter pub run flutter_native_splash:create
-    ```
-
-4.  **Lancez l'application** :
-    ```sh
-    flutter run
-    ```
-
-### Workflow de Développement Rapide
-
-Une fois l'application lancée avec `flutter run`, ne quittez pas le processus. Utilisez les commandes suivantes dans le terminal pour des mises à jour quasi-instantanées :
-
--   Appuyez sur **`r`** (minuscule) pour effectuer un **Hot Reload** (recharge l'UI en moins d'une seconde).
--   Appuyez sur **`R`** (majuscule) pour effectuer un **Hot Restart** (redémarre l'application en quelques secondes).
-
-## Dépendances Clés
-
--   `google_fonts`: Pour utiliser des polices personnalisées depuis Google Fonts.
--   `flutter_svg`: Pour afficher des images au format SVG.
--   `sqflite` & `path`: Pour la gestion de la base de données locale SQLite.
--   `flutter_secure_storage`: Pour stocker de manière sécurisée les jetons de session.
--   `crypto`: Pour le hachage des mots de passe et des PINs.
--   `flutter_launcher_icons`: Pour générer l'icône de l'application.
--   `flutter_native_splash`: Pour générer l'écran de démarrage.
-
-## Feuille de Route (Prochaines Étapes)
-
-1.  **Logique d'Authentification** : Connecter l'UI aux fonctions de la base de données pour l'inscription et la connexion.
-2.  **Gestion de Session** : Utiliser `flutter_secure_storage` pour maintenir l'utilisateur connecté.
-3.  **Implémentation des Transactions** : Coder la logique pour les dépôts, retraits et transferts (simulation locale).
-4.  **Affichage des Données** : Lier le tableau de bord et l'historique aux données de la base de données.
+Application mobile financière de la plateforme **Etoanko-Pay** (`https://etoanko-pay.arited.org`).  
+Développée en **Flutter / Dart**, cette première version (v1.0) est un prototype fonctionnel complet fonctionnant en **mode simulation locale avec persistance SQLite**.
 
 ---
+
+## 📸 Aperçu des Écrans
+
+| Écran de Connexion | Écran d'Inscription | Tableau de Bord |
+| :---: | :---: | :---: |
+| Connexion sécurisée | Validation téléphone (+237) & PIN | Solde réactif & actions rapides |
+
+| Recharger (Dépôt) | Retrait (Payout) | Transférer |
+| :---: | :---: | :---: |
+| Choix Orange / MTN | Vérification solde insuffisant | Validation par Code PIN |
+
+---
+
+## 🛠️ Stack Technique & Dépendances
+
+- **Framework** : Flutter (SDK ^3.x)
+- **Langage** : Dart
+- **Gestion d'état (State Management)** : `flutter_riverpod` (v2.x) — Réactivité en temps réel
+- **Base de données locale** : `sqflite` + `path` — Persistance SQLite locale
+- **Sécurité** : `crypto` (Hachage SHA-256 des mots de passe et PINs) + `flutter_secure_storage`
+- **Design & UI** : `google_fonts` (Poppins), `flutter_svg`, `cupertino_icons`
+
+---
+
+## 📂 Architecture du Projet
+
+Le projet suit une architecture **Clean Architecture par Fonctionnalité (Feature-First)** :
+
+lib/
+├── core/ # Code partagé et réutilisable
+│ ├── api/
+│ │ └── api_config.dart # Configuration des URLs et constantes API
+│ ├── db/
+│ │ └── database_helper.dart # Gestionnaire SQLite Singleton (Tables & CRUD)
+│ └── security/
+│ └── password_hasher.dart # Utilitaire de hachage SHA-256
+│
+├── features/ # Fonctionnalités découpées par domaine
+│ ├── auth/ # Authentification & Inscription
+│ │ ├── data/
+│ │ ├── domain/
+│ │ └── presentation/
+│ │ └── screens/
+│ │ ├── login_screen.dart # Écran de connexion
+│ │ └── register_screen.dart# Inscription avec CGU et validation
+│ │
+│ ├── dashboard/ # Tableau de bord principal
+│ │ └── presentation/
+│ │ ├── providers/
+│ │ │ └── dashboard_providers.dart # Providers Riverpod pour solde & profil
+│ │ └── screens/
+│ │ └── dashboard_screen.dart # Écran principal avec solde dynamique
+│ │
+│ └── transactions/ # Opérations financières
+│ └── presentation/
+│ └── screens/
+│ ├── charge_screen.dart # Dépôt / Recharge (Orange / MTN)
+│ ├── payout_screen.dart # Retrait avec contrôle du solde
+│ ├── transfer_screen.dart# Transfert d'argent entre comptes
+│ └── history_screen.dart # Historique des transactions
+│
+└── main.dart # Point d'entrée de l'application & Thème
+
+text
+
+
+---
+
+## 🗄️ Schéma de la Base de Données Locale (SQLite)
+
+La base de données SQLite s'appelle `EtoankoPay.db` et comporte deux tables principales :
+
+### Table `users`
+| Champ | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `INTEGER` | Clé primaire (Auto-incrément) |
+| `name` | `TEXT` | Nom complet de l'utilisateur |
+| `email` | `TEXT` | Adresse email (Unique) |
+| `phone` | `TEXT` | Numéro au format `+2376XXXXXXXX` (Unique) |
+| `password_hash` | `TEXT` | Mot de passe haché en SHA-256 |
+| `pin_hash` | `TEXT` | Code PIN à 4 chiffres haché en SHA-256 |
+| `balance` | `REAL` | Solde du compte (par défaut `0.0`) |
+| `created_at` | `TIMESTAMP` | Date de création |
+
+### Table `transactions`
+| Champ | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `INTEGER` | Clé primaire |
+| `user_id` | `INTEGER` | Clé étrangère vers `users(id)` |
+| `type` | `TEXT` | Type : `'charge'`, `'payout'`, `'transfer'` |
+| `amount` | `REAL` | Montant de la transaction en FCFA |
+| `recipient_phone`| `TEXT` | Numéro du destinataire (si transfert/retrait) |
+| `description` | `TEXT` | Description lisible |
+| `status` | `TEXT` | Statut (`'completed'`, `'pending'`, `'failed'`) |
+| `created_at` | `TIMESTAMP` | Horodatage de l'opération |
+
+---
+
+## 🚀 Guide de Démarrage Rapide
+
+### Prérequis
+1. **Flutter SDK** (v3.10 ou supérieure) installé.
+2. Un émulateur Android/iOS ou un appareil physique connecté.
+3. VS Code ou Android Studio.
+
+### Installation
+
+1. **Cloner le dépôt** :
+   ```bash
+   git clone <URL_DU_DEPOT_GIT>
+   cd etoanko_pay
+
+    Installer les dépendances :
+
+    Bash
+
+    flutter pub get
+
+    Lancer le projet :
+
+    Bash
+
+    flutter run
+
