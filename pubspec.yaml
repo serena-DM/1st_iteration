@@ -1,0 +1,29 @@
+name: etoanko_pay
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Dépendances pour le design
+  cupertino_icons: ^1.0.2
+  google_fonts: ^6.1.0  
+  flutter_svg: ^2.0.7   
+
+  # Dépendances pour la base de données et la sécurité
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  crypto: ^3.0.3
+  flutter_secure_storage: ^9.0.0
+  flutter_riverpod: ^2.4.0
+  # Dépendances pour la génération d'icônes/splash
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  flutter_launcher_icons: "^0.13.1"
+  flutter_native_splash: ^2.3.1
